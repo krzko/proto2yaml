@@ -262,7 +262,7 @@ func getFiles(root, extension string) ([]string, error) {
 		}
 
 		if !strings.HasSuffix(relpath, extension) || info.IsDir() {
-			// Exclude directories or website dir.
+			// Exclude directories
 			return nil
 		}
 		files = append(files, path)

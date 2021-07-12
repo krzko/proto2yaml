@@ -1,0 +1,386 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"math/rand"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/emicklei/proto"
+	"github.com/fatih/color"
+	cli "github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v3"
+)
+
+var (
+	buildVersion string
+	// commit       string
+)
+
+type ProtoExport struct {
+	Version  string        `json:"version" yaml:"version"`
+	Packages []PackageItem `json:"packages" yaml:"packages"`
+}
+type PackageItem struct {
+	Package  string        `json:"package" yaml:"package"`
+	Services []ServiceItem `json:"services" yaml:"services"`
+}
+type ServiceItem struct {
+	Service string   `json:"service" yaml:"service"`
+	RPCs    []string `json:"rpc" yaml:"rpc"`
+}
+
+func main() {
+	buildVersion = "v0.0.1"
+
+	// Rainbow
+	c := []color.Attribute{color.FgRed, color.FgGreen, color.FgYellow, color.FgMagenta, color.FgCyan, color.FgWhite, color.FgHiRed, color.FgHiGreen, color.FgHiYellow, color.FgHiBlue, color.FgHiMagenta, color.FgHiCyan, color.FgHiWhite}
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(c), func(i, j int) { c[i], c[j] = c[j], c[i] })
+	c0 := color.New(c[0]).SprintFunc()
+	c1 := color.New(c[1]).SprintFunc()
+	c2 := color.New(c[2]).SprintFunc()
+	c3 := color.New(c[3]).SprintFunc()
+	c4 := color.New(c[4]).SprintFunc()
+	c5 := color.New(c[5]).SprintFunc()
+	c6 := color.New(c[6]).SprintFunc()
+	c7 := color.New(c[7]).SprintFunc()
+	c8 := color.New(c[8]).SprintFunc()
+	c9 := color.New(c[9]).SprintFunc()
+	appName := fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", c0("p"), c1("r"), c2("o"), c3("t"), c4("o"), c5("2"), c6("y"), c7("a"), c8("m"), c9("l"))
+
+	app := &cli.App{
+		Name:      appName,
+		Usage:     "A command-line utility to convert Protocol Buffers (proto) files to YAML",
+		UsageText: "proto2yaml [global options] command [command options] [arguments...]",
+		Version:   buildVersion,
+		CommandNotFound: func(c *cli.Context, command string) {
+			fmt.Fprintf(c.App.Writer, "pro2yaml: Command not found: %q\n", command)
+		},
+	}
+
+	app.Commands = cli.Commands{
+		{
+			Name:  "json",
+			Usage: "The outputs are formatted as a JSON",
+			Subcommands: []*cli.Command{
+				{
+					Name:    "print",
+					Aliases: []string{"p"},
+					Usage:   "Prints, Hello JSON world!",
+					Action: func(c *cli.Context) error {
+						// j := pj.JsonPkg{}
+						// j.PrintJson()
+						return nil
+					},
+				},
+			},
+		},
+		{
+			Name:  "toml",
+			Usage: "The outputs are formatted as a TOML",
+			Subcommands: []*cli.Command{
+				{
+					Name:    "print",
+					Aliases: []string{"p"},
+					Usage:   "Prints, Hello TOML world!",
+					Action: func(c *cli.Context) error {
+						// t := pt.TomlPkg{}
+						// t.PrintToml()
+						return nil
+					},
+				},
+			},
+		},
+		{
+			Name:  "yaml",
+			Usage: "The outputs are formatted as a YAML",
+			Subcommands: []*cli.Command{
+				{
+					Name:    "export",
+					Aliases: []string{"x"},
+					Usage:   "Exports the proto defintions to a YAML file",
+					Flags: []cli.Flag{
+						// &cli.BoolFlag{
+						// 	Name:        "openslo",
+						// 	Usage:       "Exports in OpenSLO format, --file slo",
+						// 	DefaultText: "--openslo=false",
+						// 	Aliases:     []string{"slo"},
+						// },
+						&cli.StringFlag{
+							Name:        "file",
+							Usage:       "The exported file",
+							DefaultText: "./foobar_protos.yaml",
+							Aliases:     []string{"f"},
+							Required:    true,
+						},
+						&cli.StringFlag{
+							Name:        "source",
+							Usage:       "The source directory",
+							DefaultText: "~/foobar/proto",
+							Aliases:     []string{"s"},
+							Required:    true,
+						},
+					},
+					Action: func(c *cli.Context) error {
+						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString(c.String("file")))
+
+						// Get files
+						files, err := getFiles(c.String("source"), ".proto")
+						if err != nil {
+							panic(err)
+						}
+
+						// Return filtered files
+						ff, err := searchFiles(files, "Request) returns")
+						if err != nil {
+							panic(err)
+						}
+
+						// parse protos
+						parseFiles(ff)
+
+						generateExport(c.String("file"), ff)
+
+						// generateMarkdowns("fabric", ff)
+
+						return nil
+					},
+				},
+				{
+					Name:    "print",
+					Aliases: []string{"p"},
+					Usage:   "Prints, Hello YAML world!",
+					Action: func(c *cli.Context) error {
+						// ye := YamlExport{}
+						// y.PrintYaml()
+						return nil
+					},
+				},
+			},
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func generateExport(fileName string, files []string) error {
+	pe := &ProtoExport{}
+	pe.Version = buildVersion
+
+	var Packages []PackageItem
+	var Services []ServiceItem
+	var RPCs []string
+
+	for _, f := range files {
+		reader, _ := os.Open(f)
+		defer reader.Close()
+
+		parser := proto.NewParser(reader)
+		definition, _ := parser.Parse()
+
+		proto.Walk(definition,
+			proto.WithPackage(func(s *proto.Package) {
+				check := containsPackage(Packages, s.Name)
+				if !check {
+					Packages = append(Packages, PackageItem{
+						Package: s.Name,
+					})
+				}
+			}),
+			proto.WithService(func(s *proto.Service) {
+				check := containsService(Services, s.Name)
+				if !check {
+					Services = append(Services, ServiceItem{
+						Service: s.Name,
+					})
+				}
+			}),
+			proto.WithRPC(func(s *proto.RPC) {
+				// Cleanup parent
+				parent := fmt.Sprintf("%v", s.Parent)
+				p := strings.Split(parent, " ")
+
+				// // Check if service exists
+				check := containsService(Services, p[2])
+				if check {
+					// Add rpc if service exists
+					cont := contains(Services[len(Services)-1].RPCs, s.Name)
+					if !cont {
+						Services[len(Services)-1].RPCs = append(Services[len(Services)-1].RPCs, s.Name)
+					}
+				} else {
+					// Add service and rpc
+					Services = append(Services, ServiceItem{
+						Service: p[2],
+						RPCs:    append(RPCs, s.Name),
+					})
+				}
+			}))
+
+	}
+
+	// fmt.Println("---")
+	// p, _ := json.Marshal(Packages)
+	// fmt.Println(string(p))
+	// fmt.Println("---")
+	// sj, _ := json.Marshal(Services)
+	// fmt.Println(string(sj))
+	fmt.Println("---")
+	sy, _ := yaml.Marshal(Services)
+	fmt.Println(string(sy))
+	fmt.Println("---")
+	py, _ := yaml.Marshal(Packages)
+	fmt.Println(string(py))
+	fmt.Println("---")
+	ppe, _ := yaml.Marshal(pe)
+	fmt.Println(string(ppe))
+
+	return nil
+
+}
+
+func getFiles(root, extension string) ([]string, error) {
+	var files []string
+
+	fmt.Printf("%s %s %v\n", color.BlueString("==>"), color.HiWhiteString(("Walking")), root)
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		relpath, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+
+		if !strings.HasSuffix(relpath, extension) || info.IsDir() {
+			// Exclude directories or website dir.
+			return nil
+		}
+		files = append(files, path)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("%s %s %s %s %s\n", color.BlueString("==>"), color.HiWhiteString("Found"), color.HiGreenString(fmt.Sprint(len(files))), color.HiWhiteString(extension), color.HiWhiteString("files"))
+	return files, nil
+}
+
+// func handleMessage(m *proto.Message) {
+// 	fmt.Printf("%v \n", m.Name)
+// }
+
+func handlePackage(p *proto.Package) {
+	fmt.Printf("%v\n", p.Name)
+}
+
+func handleRPC(r *proto.RPC) {
+	parent := fmt.Sprintf("%v", r.Parent)
+	p := strings.Split(parent, " ")
+	fmt.Printf("%s %v | %v\n", color.BlueString("==>"), p[2], r.Name)
+
+	// fmt.Println("data written")
+}
+
+func handleService(s *proto.Service) {
+	fmt.Printf("%v\n", s.Name)
+}
+
+func parseFiles(files []string) {
+
+	for _, f := range files {
+		reader, err := os.Open(f)
+		if err != nil {
+			panic(err)
+		}
+		defer reader.Close()
+
+		parser := proto.NewParser(reader)
+		definition, _ := parser.Parse()
+
+		fmt.Printf("%s %s\n", color.GreenString("==>"), color.HiWhiteString("📄 "+f))
+		// proto.Walk(definition, proto.WithService(handleService), proto.WithMessage(handleMessage))
+		fmt.Printf("%s %s ", color.GreenString("==>"), color.HiWhiteString("📦 Package"))
+		proto.Walk(definition, proto.WithPackage(handlePackage))
+
+		// fmt.Printf("%s %s\n", color.GreenString("==>"), color.HiWhiteString("🎁 💈 Service/s"))
+		// proto.Walk(definition, proto.WithService(handleService))
+
+		fmt.Printf("%s %s\n", color.GreenString("==>"), color.HiWhiteString("🧩 Service | RPC"))
+		proto.Walk(definition, proto.WithRPC(handleRPC))
+
+	}
+
+}
+
+func contains(s []string, str string) (result bool) {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+
+func containsPackage(pis []PackageItem, str string) (result bool) {
+	for _, pi := range pis {
+		if pi.Package == str {
+			return true
+		}
+	}
+	return false
+}
+
+func containsService(sis []ServiceItem, str string) (result bool) {
+	for _, si := range sis {
+		if si.Service == str {
+			return true
+		}
+	}
+	return false
+}
+
+func searchFiles(files []string, filter string) ([]string, error) {
+	var found []string
+
+	fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Filter '"), color.HiGreenString(filter), color.HiWhiteString("'"))
+
+	for _, file := range files {
+		data, err := ioutil.ReadFile(file)
+		if err != nil {
+			return nil, err
+		}
+
+		f := string(data)
+		if strings.Contains(f, "Request) returns (stream") {
+			// Skip streams
+		} else if strings.Contains(f, filter) {
+			found = append(found, file)
+		}
+	}
+
+	fmt.Printf("%s %s %s %s\n", color.BlueString("==>"), color.HiWhiteString("Using"), color.HiGreenString(fmt.Sprint(len(found))), color.HiWhiteString("filtered files"))
+	return found, nil
+}
+
+func unique(stringSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range stringSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}

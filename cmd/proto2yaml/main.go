@@ -34,8 +34,6 @@ type ServiceItem struct {
 }
 
 func main() {
-	buildVersion = "v0.0.1"
-
 	// Rainbow
 	c := []color.Attribute{color.FgRed, color.FgGreen, color.FgYellow, color.FgMagenta, color.FgCyan, color.FgWhite, color.FgHiRed, color.FgHiGreen, color.FgHiYellow, color.FgHiBlue, color.FgHiMagenta, color.FgHiCyan, color.FgHiWhite}
 	rand.Seed(time.Now().UnixNano())
@@ -175,10 +173,6 @@ func generateExport(fileName string, files []string) error {
 	pe := &ProtoExport{}
 	pe.Version = buildVersion
 
-	var Packages []PackageItem
-	var Services []ServiceItem
-	var RPCs []string
-
 	for _, f := range files {
 		reader, _ := os.Open(f)
 		defer reader.Close()
@@ -186,45 +180,48 @@ func generateExport(fileName string, files []string) error {
 		parser := proto.NewParser(reader)
 		definition, _ := parser.Parse()
 
-		proto.Walk(definition,
-			proto.WithPackage(func(s *proto.Package) {
-				check := containsPackage(Packages, s.Name)
-				if !check {
-					Packages = append(Packages, PackageItem{
-						Package: s.Name,
+		// only one package per file, keep track to add services to this package
+		var index int
+		for _, e := range definition.Elements {
+			if p, ok := e.(*proto.Package); ok {
+				index, ok = findPackage(pe.Packages, p.Name)
+				if !ok {
+					pe.Packages = append(pe.Packages, PackageItem{
+						Package: p.Name,
 					})
+					index = len(pe.Packages) - 1
 				}
-			}),
+				// only one package per file so can break
+				break
+			}
+		}
+
+		proto.Walk(definition,
 			proto.WithService(func(s *proto.Service) {
-				check := containsService(Services, s.Name)
+				check := containsService(pe.Packages[index].Services, s.Name)
 				if !check {
-					Services = append(Services, ServiceItem{
+					pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
 						Service: s.Name,
 					})
 				}
 			}),
-			proto.WithRPC(func(s *proto.RPC) {
-				// Cleanup parent
-				parent := fmt.Sprintf("%v", s.Parent)
-				p := strings.Split(parent, " ")
+			proto.WithRPC(func(rpc *proto.RPC) {
+				parent, ok := rpc.Parent.(*proto.Service)
+				if !ok {
+					return
+				}
 
-				// // Check if service exists
-				check := containsService(Services, p[2])
+				i, check := findService(pe.Packages[index].Services, parent.Name)
 				if check {
-					// Add rpc if service exists
-					cont := contains(Services[len(Services)-1].RPCs, s.Name)
-					if !cont {
-						Services[len(Services)-1].RPCs = append(Services[len(Services)-1].RPCs, s.Name)
-					}
+					pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, rpc.Name)
 				} else {
 					// Add service and rpc
-					Services = append(Services, ServiceItem{
-						Service: p[2],
-						RPCs:    append(RPCs, s.Name),
+					pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
+						Service: parent.Name,
+						RPCs:    []string{rpc.Name},
 					})
 				}
 			}))
-
 	}
 
 	// fmt.Println("---")
@@ -234,12 +231,12 @@ func generateExport(fileName string, files []string) error {
 	// sj, _ := json.Marshal(Services)
 	// fmt.Println(string(sj))
 	fmt.Println("---")
-	sy, _ := yaml.Marshal(Services)
-	fmt.Println(string(sy))
-	fmt.Println("---")
-	py, _ := yaml.Marshal(Packages)
-	fmt.Println(string(py))
-	fmt.Println("---")
+	//sy, _ := yaml.Marshal(packages)
+	//fmt.Println(string(sy))
+	//fmt.Println("---")
+	//py, _ := yaml.Marshal(Packages)
+	//fmt.Println(string(py))
+	//fmt.Println("---")
 	ppe, _ := yaml.Marshal(pe)
 	fmt.Println(string(ppe))
 
@@ -348,6 +345,24 @@ func containsService(sis []ServiceItem, str string) (result bool) {
 		}
 	}
 	return false
+}
+
+func findPackage(pis []PackageItem, str string) (int, bool) {
+	for i, pi := range pis {
+		if pi.Package == str {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
+func findService(sis []ServiceItem, str string) (int, bool) {
+	for i, si := range sis {
+		if si.Service == str {
+			return i, true
+		}
+	}
+	return -1, false
 }
 
 func searchFiles(files []string, filter string) ([]string, error) {

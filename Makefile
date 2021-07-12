@@ -2,7 +2,7 @@
 
 OUTPUT:=bin
 EXECUTABLE:=proto2yaml
-DOCKER_REGISTRY:=hub.docker.com
+DOCKER_REGISTRY:=ghcr.io/krzko
 
 VERSION:=0.0.1
 COMMIT=$(shell git describe --tags --always --long)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -13,6 +14,9 @@ import (
 	"github.com/fatih/color"
 	cli "github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
+
+	"github.com/krzko/proto2yaml/pkg/json_export"
+	"github.com/krzko/proto2yaml/pkg/yaml_export"
 )
 
 var (
@@ -66,33 +70,146 @@ func main() {
 			Usage: "The outputs are formatted as a JSON",
 			Subcommands: []*cli.Command{
 				{
-					Name:    "print",
-					Aliases: []string{"p"},
-					Usage:   "Prints, Hello JSON world!",
+					Name:    "export",
+					Aliases: []string{"x"},
+					Usage:   "Exports the proto defintions to a file",
+					Flags: []cli.Flag{
+						&cli.BoolFlag{
+							Name:        "pretty",
+							Usage:       "Pretty prints the output, export --pretty",
+							DefaultText: "",
+						},
+						&cli.StringFlag{
+							Name:        "file",
+							Usage:       "The exported file",
+							DefaultText: "./foobar_protos.yaml",
+							Aliases:     []string{"f"},
+							Required:    true,
+						},
+						&cli.StringFlag{
+							Name:        "source",
+							Usage:       "The source directory",
+							DefaultText: "~/foobar/proto",
+							Aliases:     []string{"s"},
+							Required:    true,
+						},
+					},
 					Action: func(c *cli.Context) error {
-						// j := pj.JsonPkg{}
-						// j.PrintJson()
+						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString(c.String("file")))
+
+						// Get files
+						files, err := getFiles(c.String("source"), ".proto")
+						if err != nil {
+							panic(err)
+						}
+
+						// Return filtered files
+						ff, err := searchFiles(files, "Request) returns")
+						if err != nil {
+							panic(err)
+						}
+
+						// Parse the protos
+						parseFiles(ff)
+
+						// Generate object to export
+						obj, err := generateExport(ff)
+						if err != nil {
+							panic(err)
+						}
+
+						// Forat the obj
+						j, _ := json.Marshal(obj)
+						je := json_export.JsonExport{}
+
+						if c.Bool("pretty") {
+							fmt.Println()
+							jpp, _ := je.PrettyPrint([]byte(j))
+							je.SaveFile(jpp, c.String("file"))
+						} else {
+							fmt.Println()
+							je.SaveFile(j, c.String("file"))
+						}
+
 						return nil
 					},
 				},
-			},
-		},
-		{
-			Name:  "toml",
-			Usage: "The outputs are formatted as a TOML",
-			Subcommands: []*cli.Command{
 				{
 					Name:    "print",
 					Aliases: []string{"p"},
-					Usage:   "Prints, Hello TOML world!",
+					Usage:   "Prints the proto defintions to console",
+					Flags: []cli.Flag{
+						&cli.BoolFlag{
+							Name:        "pretty",
+							Usage:       "Pretty prints the output, print --pretty",
+							DefaultText: "",
+						},
+						&cli.StringFlag{
+							Name:        "source",
+							Usage:       "The source directory",
+							DefaultText: "~/foobar/proto",
+							Aliases:     []string{"s"},
+							Required:    true,
+						},
+					},
 					Action: func(c *cli.Context) error {
-						// t := pt.TomlPkg{}
-						// t.PrintToml()
+						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString(c.String("file")))
+
+						// Get files
+						files, err := getFiles(c.String("source"), ".proto")
+						if err != nil {
+							panic(err)
+						}
+
+						// Return filtered files
+						ff, err := searchFiles(files, "Request) returns")
+						if err != nil {
+							panic(err)
+						}
+
+						// Parse the protos
+						parseFiles(ff)
+
+						// Generate object to export
+						obj, err := generateExport(ff)
+						if err != nil {
+							panic(err)
+						}
+
+						// Forat the obj
+						j, _ := json.Marshal(obj)
+						je := json_export.JsonExport{}
+
+						if c.Bool("pretty") {
+							fmt.Println()
+							jpp, _ := je.PrettyPrint([]byte(j))
+							fmt.Printf("%s", jpp)
+						} else {
+							fmt.Println()
+							fmt.Println(string(j))
+						}
+
 						return nil
 					},
 				},
 			},
 		},
+		// {
+		// 	Name:  "toml",
+		// 	Usage: "The outputs are formatted as a TOML",
+		// 	Subcommands: []*cli.Command{
+		// 		{
+		// 			Name:    "print",
+		// 			Aliases: []string{"p"},
+		// 			Usage:   "Prints the proto defintions to console",
+		// 			Action: func(c *cli.Context) error {
+		// 				// t := pt.TomlPkg{}
+		// 				// t.PrintToml()
+		// 				return nil
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			Name:  "yaml",
 			Usage: "The outputs are formatted as a YAML",
@@ -100,7 +217,7 @@ func main() {
 				{
 					Name:    "export",
 					Aliases: []string{"x"},
-					Usage:   "Exports the proto defintions to a YAML file",
+					Usage:   "Exports the proto defintions to a file",
 					Flags: []cli.Flag{
 						// &cli.BoolFlag{
 						// 	Name:        "openslo",
@@ -138,12 +255,19 @@ func main() {
 							panic(err)
 						}
 
-						// parse protos
+						// Parse the protos
 						parseFiles(ff)
 
-						generateExport(c.String("file"), ff)
+						// Generate object to export
+						obj, err := generateExport(ff)
+						if err != nil {
+							panic(err)
+						}
 
-						// generateMarkdowns("fabric", ff)
+						// Print obj
+						y, _ := yaml.Marshal(obj)
+						ye := yaml_export.YamlExport{}
+						ye.SaveFile(y, c.String("file"))
 
 						return nil
 					},
@@ -151,10 +275,44 @@ func main() {
 				{
 					Name:    "print",
 					Aliases: []string{"p"},
-					Usage:   "Prints, Hello YAML world!",
+					Usage:   "Prints the proto defintions to console",
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:        "source",
+							Usage:       "The source directory",
+							DefaultText: "~/foobar/proto",
+							Aliases:     []string{"s"},
+							Required:    true,
+						},
+					},
 					Action: func(c *cli.Context) error {
-						// ye := YamlExport{}
-						// y.PrintYaml()
+						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString(c.String("file")))
+
+						// Get files
+						files, err := getFiles(c.String("source"), ".proto")
+						if err != nil {
+							panic(err)
+						}
+
+						// Return filtered files
+						ff, err := searchFiles(files, "Request) returns")
+						if err != nil {
+							panic(err)
+						}
+
+						// Parse the protos
+						parseFiles(ff)
+
+						// Generate object to export
+						obj, err := generateExport(ff)
+						if err != nil {
+							panic(err)
+						}
+
+						// Print obj
+						y, _ := yaml.Marshal(obj)
+						fmt.Println(string(y))
+
 						return nil
 					},
 				},
@@ -169,7 +327,7 @@ func main() {
 	}
 }
 
-func generateExport(fileName string, files []string) error {
+func generateExport(files []string) (*ProtoExport, error) {
 	pe := &ProtoExport{}
 	pe.Version = buildVersion
 
@@ -224,23 +382,7 @@ func generateExport(fileName string, files []string) error {
 			}))
 	}
 
-	// fmt.Println("---")
-	// p, _ := json.Marshal(Packages)
-	// fmt.Println(string(p))
-	// fmt.Println("---")
-	// sj, _ := json.Marshal(Services)
-	// fmt.Println(string(sj))
-	fmt.Println("---")
-	//sy, _ := yaml.Marshal(packages)
-	//fmt.Println(string(sy))
-	//fmt.Println("---")
-	//py, _ := yaml.Marshal(Packages)
-	//fmt.Println(string(py))
-	//fmt.Println("---")
-	ppe, _ := yaml.Marshal(pe)
-	fmt.Println(string(ppe))
-
-	return nil
+	return pe, nil
 
 }
 

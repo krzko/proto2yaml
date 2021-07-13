@@ -1,9 +1,12 @@
 package yaml_export
 
-import "fmt"
+import "io/ioutil"
 
 type YamlExport struct{}
 
-func (y *YamlExport) PrintYaml() {
-	fmt.Println("Hello YAML world!")
+func (y *YamlExport) SaveFile(b []byte, f string) {
+	err := ioutil.WriteFile(f, b, 0644)
+	if err != nil {
+		panic(err)
+	}
 }

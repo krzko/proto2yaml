@@ -1,0 +1,440 @@
+version: 0.0.1
+packages:
+    - package: fabric.service.accounts.v1alpha5
+      services:
+        - service: AccountAPI
+          rpc:
+            - GetAccountList
+        - service: AdminAPI
+          rpc:
+            - CreateAccount
+            - DeleteAccount
+            - BulkCreateAccount
+            - BulkDeleteAccount
+            - CreateGoal
+            - DeleteGoal
+            - BulkCreateGoal
+            - BulkDeleteGoal
+        - service: GoalAPI
+          rpc:
+            - CreateGoal
+            - UpdateGoal
+            - GetGoalHistory
+    - package: fabric.service.accounts.v1alpha6
+      services:
+        - service: AccountAPI
+          rpc:
+            - GetAccountList
+        - service: AdminAPI
+          rpc:
+            - CreateAccount
+            - DeleteAccount
+            - BulkCreateAccount
+            - BulkDeleteAccount
+            - CreateGoal
+            - DeleteGoal
+            - BulkCreateGoal
+            - BulkDeleteGoal
+        - service: GoalAPI
+          rpc:
+            - CreateGoal
+            - UpdateGoal
+            - GetGoalHistory
+    - package: fabric.service.accounts.v1alpha7
+      services:
+        - service: AccountAPI
+          rpc:
+            - GetAccountList
+        - service: GoalAPI
+          rpc:
+            - CreateGoal
+            - UpdateGoal
+    - package: fabric.service.alias.v1beta1
+      services:
+        - service: AliasAPI
+          rpc:
+            - ListAliases
+    - package: fabric.service.bluepages.v1alpha2
+      services:
+        - service: BluepagesAPI
+          rpc:
+            - CreateContact
+            - UpdateContact
+            - GetContacts
+            - DeleteContact
+            - CreatePaymentMethod
+            - UpdatePaymentMethod
+            - DeletePaymentMethod
+    - package: fabric.service.bluepages.v1alpha3
+      services:
+        - service: BluepagesAPI
+          rpc:
+            - CreateContact
+            - GetContact
+            - ListContacts
+            - DeleteContact
+            - UpdateContactProfile
+            - CreatePaymentMethod
+            - UpdatePaymentMethod
+            - DeletePaymentMethod
+    - package: fabric.service.bluepages.v1alpha4
+      services:
+        - service: BluepagesAPI
+          rpc:
+            - CreateContact
+            - GetContact
+            - ListContacts
+            - UpdateContact
+            - DeleteContact
+            - DeleteContacts
+    - package: fabric.service.bluepages.v1beta1
+      services:
+        - service: PayeeAPI
+          rpc:
+            - CreatePayee
+            - UpdatePayee
+            - GetPayees
+            - ListPayees
+            - DeletePayees
+            - QueryPaymentMethods
+            - AddQuickPayees
+            - UpdateQuickPayees
+            - DeleteQuickPayees
+            - ListQuickPayees
+    - package: fabric.service.bsb.v1alpha1
+      services:
+        - service: BSBAPI
+          rpc:
+            - ValidateBSB
+            - UpdateBSBList
+            - GetBSBDetails
+    - package: fabric.service.card.v1alpha1
+      services:
+        - service: CardAPI
+          rpc:
+            - List
+            - GetDetails
+            - Activate
+            - SelectPIN
+            - Replace
+    - package: fabric.service.card.v1alpha2
+      services:
+        - service: CardAPI
+          rpc:
+            - List
+            - GetDetails
+            - Activate
+            - GetWrappingKey
+            - ResetPIN
+            - SetPIN
+            - VerifyPIN
+            - ChangePIN
+            - Replace
+            - AuditTrail
+    - package: fabric.service.card.v1beta1
+      services:
+        - service: CardAPI
+          rpc:
+            - List
+            - GetDetails
+            - Activate
+            - GetWrappingKey
+            - ResetPIN
+            - SetPIN
+            - VerifyPIN
+            - ChangePIN
+            - Replace
+            - AuditTrail
+    - package: fabric.service.cardcontrols.v1alpha2
+      services:
+        - service: CardControlAPI
+          rpc:
+            - Query
+            - Set
+            - Remove
+            - Enrol
+            - Disenrol
+    - package: fabric.service.cardcontrols.v1alpha3
+      services:
+        - service: CardControlsAPI
+          rpc:
+            - Query
+            - Set
+            - Remove
+            - Enrol
+            - Disenrol
+            - Replace
+            - Block
+    - package: fabric.service.cardcontrols.v1beta1
+      services:
+        - service: CardControlsAPI
+          rpc:
+            - List
+            - Query
+            - Set
+            - Remove
+            - Enrol
+            - Disenrol
+            - Replace
+            - Block
+    - package: fabric.service.docbox.v1beta1
+      services:
+        - service: StatementAPI
+          rpc:
+            - ListStatements
+            - GetSignedStatementURL
+    - package: fabric.service.eligibility.v1alpha1
+      services:
+        - service: CardEligibilityAPI
+          rpc:
+            - Can
+    - package: fabric.service.eligibility.v1beta1
+      services:
+        - service: CardEligibilityAPI
+          rpc:
+            - Can
+    - package: fabric.service.entitlements.v1alpha3
+      services:
+        - service: EntitlementsQueryAPI
+          rpc:
+            - May
+            - List
+        - service: EntitlementsControlAPI
+          rpc:
+            - AffirmUser
+            - VoidParty
+            - VoidPersona
+            - VoidResource
+            - Entitle
+            - Disentitle
+    - package: fabric.service.entitlements.v1alpha4
+      services:
+        - service: AccountEntitlementsAPI
+          rpc:
+            - GetEntitledAccount
+            - ListEntitledAccounts
+        - service: CardEntitlementsAPI
+          rpc:
+            - GetEntitledCard
+            - ListEntitledCards
+        - service: EntitlementsControlAPI
+          rpc:
+            - DeletePersona
+            - DeleteAccount
+            - DeleteCard
+            - CreateAccountEntitlement
+            - UpdateAccountEntitlement
+            - CreateOrUpdateAccountEntitlement
+            - DeleteAccountEntitlement
+            - CreateCardEntitlement
+            - UpdateCardEntitlement
+            - CreateOrUpdateCardEntitlement
+            - DeleteCardEntitlement
+    - package: fabric.service.entitlements.v1beta1
+      services:
+        - service: AccountEntitlementsAPI
+          rpc:
+            - GetEntitledAccount
+            - ListEntitledAccounts
+        - service: CardEntitlementsAPI
+          rpc:
+            - GetEntitledCard
+            - ListEntitledCards
+            - ListPersonaForCardToken
+        - service: EntitlementsControlAPI
+          rpc:
+            - CreateParty
+            - DeactivateParty
+            - AddPartyPersonaFabricRole
+            - RemovePartyPersonaFabricRole
+            - UpdatePartyAccountLegalRole
+            - DeactivateAccount
+            - UpdatePartyCardLegalRole
+            - DeactivateCard
+            - RegisterPersonaToParty
+            - RegisterCardToPersona
+            - RegisterAccountToPersona
+            - ForcePartyToLatest
+        - service: PersonaEntitlementsAPI
+          rpc:
+            - GetEntitledPersona
+            - ListEntitledPersona
+            - ListPersonaForAccount
+    - package: fabric.service.fakerock.v1alpha1
+      services:
+        - service: FakerockAPI
+          rpc:
+            - JWKS
+            - Login
+            - SystemLogin
+        - service: FakerockRegistration
+          rpc:
+            - Register
+            - RegisterSystem
+        - service: FakerockWeb
+          rpc:
+            - ChangePassword
+    - package: fabric.service.flimflam.v1alpha1
+      services:
+        - service: Manage
+          rpc:
+            - Reset
+            - List
+            - AddResponse
+            - GetRequests
+    - package: fabric.service.insights.v1beta1
+      services:
+        - service: InsightsAPI
+          rpc:
+            - GetExpensePredictions
+    - package: fabric.service.limits.v1alpha1
+      services:
+        - service: LimitsAPI
+          rpc:
+            - GetLimit
+            - UpdateLimit
+    - package: fabric.service.merchantupdate.v1alpha1
+      services:
+        - service: MerchantUpdate
+          rpc:
+            - AcknowledgeUpdateEvent
+            - RegisterWebhook
+    - package: fabric.service.monogram.v1
+      services:
+        - service: MonogramAPI
+          rpc:
+            - GetMonogram
+    - package: fabric.service.monogram.v1alpha1
+      services:
+        - service: MonogramAPI
+          rpc:
+            - GetMonogram
+    - package: fabric.service.osko.v1alpha1
+      services:
+        - service: OskoAPI
+          rpc:
+            - ResolvePayID
+            - Eligible
+    - package: fabric.service.payeelookup.v1alpha1
+      services:
+        - service: PayeeLookupAPI
+          rpc:
+            - ResolvePayID
+            - Eligible
+    - package: fabric.service.payments.v1alpha2
+      services:
+        - service: PaymentAPI
+          rpc:
+            - Pay
+            - GetPayment
+            - SearchPayments
+        - service: ScheduleAPI
+          rpc:
+            - ExplainSchedule
+            - CreateSchedule
+            - CancelSchedule
+            - GetScheduledPaymentList
+    - package: fabric.service.payments.v1alpha3
+      services:
+        - service: PaymentAPI
+          rpc:
+            - Pay
+            - GetPayment
+            - ListPayments
+    - package: fabric.service.payments.v1alpha4
+      services:
+        - service: PaymentAPI
+          rpc:
+            - Pay
+            - GetPayment
+            - ListPayments
+    - package: fabric.service.payments.v1beta1
+      services:
+        - service: PaymentAPI
+          rpc:
+            - Transfer
+            - Pay
+            - GetPayments
+            - ListPayments
+    - package: fabric.service.productdata.v1beta1
+      services:
+        - service: ProductDataAPI
+          rpc:
+            - ListProducts
+            - UpdateProduct
+    - package: fabric.service.register.v1
+      services:
+        - service: Registrar
+          rpc:
+            - Register
+    - package: fabric.service.scheduler.v1alpha1
+      services:
+        - service: ScheduleAPI
+          rpc:
+            - ExplainSchedule
+            - CreateSchedule
+            - CancelSchedule
+            - GetScheduledPaymentList
+    - package: fabric.service.selfservice.v1alpha4
+      services:
+        - service: PartyAPI
+          rpc:
+            - GetParty
+            - UpdateParty
+        - service: PreferencesAPI
+          rpc:
+            - GetPreferences
+            - UpdatePreferences
+        - service: ProfilePictureAPI
+          rpc:
+            - GetProfilePicture
+            - LinkProfilePicture
+        - service: AddressAPI
+          rpc:
+            - SearchAddress
+            - GetAddress
+    - package: fabric.service.selfservice.v1beta1
+      services:
+        - service: PartyAPI
+          rpc:
+            - GetParty
+            - UpdateParty
+        - service: PreferencesAPI
+          rpc:
+            - GetPreferences
+            - UpdatePreferences
+        - service: ProfilePictureAPI
+          rpc:
+            - GetProfilePicture
+            - LinkProfilePicture
+        - service: AddressAPI
+          rpc:
+            - SearchAddress
+            - GetAddress
+        - service: DisputesAPI
+          rpc:
+            - CreateCardDispute
+    - package: fabric.service.tokenexchange.v1alpha2
+      services:
+        - service: TokenExchange
+          rpc:
+            - Exchange
+    - package: fabric.service.transactions.v1beta1
+      services:
+        - service: CategoryAPI
+          rpc:
+            - ListCategories
+        - service: TagAPI
+          rpc:
+            - ListTags
+            - CreateTag
+            - UpdateTag
+            - DeleteTag
+    - package: fabric.service.vcards.v1alpha1
+      services:
+        - service: Info
+          rpc:
+            - GetBuild
+        - service: Wallet
+          rpc:
+            - Apple

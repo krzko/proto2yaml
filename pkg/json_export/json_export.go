@@ -1,9 +1,22 @@
-package yaml_export
+package json_export
 
-import "fmt"
+import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+)
 
 type JsonExport struct{}
 
-func (j *JsonExport) PrintJson() {
-	fmt.Println("Hello JSON world!")
+func (j *JsonExport) PrettyPrint(b []byte) ([]byte, error) {
+	var out bytes.Buffer
+	err := json.Indent(&out, b, "", "  ")
+	return out.Bytes(), err
+}
+
+func (j *JsonExport) SaveFile(b []byte, f string) {
+	err := ioutil.WriteFile(f, b, 0644)
+	if err != nil {
+		panic(err)
+	}
 }

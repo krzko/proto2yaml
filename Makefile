@@ -68,7 +68,7 @@ build-darwin-arm64:
 	@echo
 
 build-freebsd: 
-	@echo "  👿  Building binary${FREEBSD}..."
+	@echo "  👿  Building binary ${FREEBSD}..."
 	@[ -d "${OUTPUT}/${FREEBSD}" ] || mkdir -p "${OUTPUT}/${FREEBSD}"
 	@env GOOS=freebsd GOARCH=amd64 go build -o "${OUTPUT}/${FREEBSD}/${EXECUTABLE}" -ldflags="-s -w -X main.buildVersion=${VERSION} -X main.commit=${COMMIT} -X main.date=${NOW}" cmd/${EXECUTABLE}/main.go
 	@tar -czf "${OUTPUT}/${FREEBSD}.tar.gz" "${OUTPUT}/${FREEBSD}/${EXECUTABLE}"

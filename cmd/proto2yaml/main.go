@@ -57,7 +57,7 @@ func main() {
 	app := &cli.App{
 		Name:      appName,
 		Usage:     "A command-line utility to convert Protocol Buffers (proto) files to YAML",
-		UsageText: "proto2yaml [global options] command [command options] [arguments...]",
+		UsageText: appName + " [global options] command [command options] [arguments...]",
 		Version:   buildVersion,
 		CommandNotFound: func(c *cli.Context, command string) {
 			fmt.Fprintf(c.App.Writer, "pro2yaml: Command not found: %q\n", command)
@@ -122,12 +122,11 @@ func main() {
 						j, _ := json.Marshal(obj)
 						je := json_export.JsonExport{}
 
+						fmt.Printf("%s %s %s\n", color.GreenString("==>"), color.HiWhiteString("💾 Saving to:"), color.HiGreenString(c.String("file")))
 						if c.Bool("pretty") {
-							fmt.Println()
 							jpp, _ := je.PrettyPrint([]byte(j))
 							je.SaveFile(jpp, c.String("file"))
 						} else {
-							fmt.Println()
 							je.SaveFile(j, c.String("file"))
 						}
 
@@ -180,6 +179,7 @@ func main() {
 						j, _ := json.Marshal(obj)
 						je := json_export.JsonExport{}
 
+						fmt.Printf("%s %s\n", color.GreenString("==>"), color.HiWhiteString("🖥️ Printing to console"))
 						if c.Bool("pretty") {
 							fmt.Println()
 							jpp, _ := je.PrettyPrint([]byte(j))
@@ -267,6 +267,7 @@ func main() {
 						// Print obj
 						y, _ := yaml.Marshal(obj)
 						ye := yaml_export.YamlExport{}
+						fmt.Printf("%s %s %s\n", color.GreenString("==>"), color.HiWhiteString("💾 Saving to:"), color.HiGreenString(c.String("file")))
 						ye.SaveFile(y, c.String("file"))
 
 						return nil
@@ -311,6 +312,8 @@ func main() {
 
 						// Print obj
 						y, _ := yaml.Marshal(obj)
+						fmt.Printf("%s %s\n", color.GreenString("==>"), color.HiWhiteString("🖥️ Printing to console"))
+						fmt.Println()
 						fmt.Println(string(y))
 
 						return nil

@@ -62,9 +62,8 @@ To export to a file, run the following command
 # json
 $ ./proto2yaml json export --source ./protos --file ./example_protos.json
 # json pretty
-# json
 $ ./proto2yaml json export --source ./protos --file ./example_protos.json --pretty
 
 # yaml
-$ ./proto2yaml yaml print --source ./protos --file ./example_protos.yaml
+$ ./proto2yaml yaml export --source ./protos --file ./example_protos.yaml
 ```

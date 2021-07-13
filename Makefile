@@ -21,7 +21,6 @@ WINDOWS:=${EXECUTABLE}_v${VERSION}_windows_amd64
 all: clean build
 
 build: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux build-windows build-docker
-# build: build-arm build-darwin build-freebsd build-linux build-windows build-docker push-docker
 
 build-aardvark: clean build-darwin-amd64
 

@@ -4,9 +4,13 @@
 
 Currently supported exports are for:
 
-* Package
-* Service
-* RPC
+* Packages
+* Services
+* RPCs
+
+Supported filters are for:
+
+* Options
 
 ## Overview
 
@@ -29,7 +33,7 @@ USAGE:
    proto2yaml [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.1
+   0.0.2
 
 COMMANDS:
    json     The outputs are formatted as a JSON
@@ -39,6 +43,34 @@ COMMANDS:
 GLOBAL OPTIONS:
    --help, -h     show help (default: false)
    --version, -v  print the version (default: false)
+```
+
+### Export
+
+To export to a file, run the following command
+
+```sh
+# json
+$ ./proto2yaml json export --source ./protos --file ./example_protos.json
+# json pretty
+$ ./proto2yaml json export --source ./protos --file ./example_protos.json --pretty
+
+# yaml
+$ ./proto2yaml yaml export --source ./protos --file ./example_protos.yaml
+```
+
+### Filter
+
+To filter on an `option` you can use the `--exclude-option` or `--include-option` filter. For now its based on singletons but hope to expand out multiple combinations in the future. An example is as follows:
+
+```sh
+$ proto2yaml yaml print --source ./protos --exclude-option "deprecated=true"
+```
+
+Or run the inverse of the above using:
+
+```sh
+$ proto2yaml yaml print --source ./protos --include-option "deprecated=true"
 ```
 
 ### Print
@@ -55,16 +87,16 @@ $ ./proto2yaml json print --source ./protos --pretty
 $ ./proto2yaml yaml print --source ./protos
 ```
 
-### Export
+### Disable Colour
 
-To export to a file, run the following command
+If you need to run the tool in your CI/CD pipelines and ANSI isn't supported, you can pass the following variable to disable colour:
 
 ```sh
-# json
-$ ./proto2yaml json export --source ./protos --file ./example_protos.json
-# json pretty
-$ ./proto2yaml json export --source ./protos --file ./example_protos.json --pretty
+export NO_COLOR="true"
+```
 
-# yaml
-$ ./proto2yaml yaml export --source ./protos --file ./example_protos.yaml
+To enable colour again, simply `unset` the variable:
+
+```sh
+unset NO_COLOR
 ```

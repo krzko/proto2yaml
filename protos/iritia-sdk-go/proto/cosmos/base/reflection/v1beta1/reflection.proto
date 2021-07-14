@@ -4,6 +4,7 @@ package cosmos.base.reflection.v1beta1;
 import "google/api/annotations.proto";
 
 option go_package = "github.com/bianjieai/irita-sdk-go/client/grpc/reflection";
+option deprecated = true;
 
 // ReflectionService defines a service for interface reflection.
 service ReflectionService {

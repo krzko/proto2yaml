@@ -3,6 +3,7 @@ package json_export
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -17,6 +18,6 @@ func (j *JsonExport) PrettyPrint(b []byte) ([]byte, error) {
 func (j *JsonExport) SaveFile(b []byte, f string) {
 	err := ioutil.WriteFile(f, b, 0644)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 }

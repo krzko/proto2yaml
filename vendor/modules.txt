@@ -12,7 +12,6 @@ github.com/mattn/go-colorable
 github.com/mattn/go-isatty
 # github.com/pelletier/go-toml v1.9.3
 ## explicit
-github.com/pelletier/go-toml
 # github.com/russross/blackfriday/v2 v2.0.1
 github.com/russross/blackfriday/v2
 # github.com/shurcooL/sanitized_anchor_name v1.0.0

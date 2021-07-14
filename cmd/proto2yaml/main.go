@@ -74,10 +74,12 @@ func main() {
 					Aliases: []string{"x"},
 					Usage:   "Exports the proto defintions to a file",
 					Flags: []cli.Flag{
-						&cli.BoolFlag{
-							Name:        "pretty",
-							Usage:       "Pretty prints the output, export --pretty",
+						&cli.StringSliceFlag{
+							Name:        "exclude-option",
+							Usage:       "Exclude this option to filter on, e.g. --exclude-option 'deprecated=true'",
+							Aliases:     []string{"eo"},
 							DefaultText: "",
+							Required:    false,
 						},
 						&cli.StringFlag{
 							Name:        "file",
@@ -85,6 +87,18 @@ func main() {
 							DefaultText: "./foobar_protos.yaml",
 							Aliases:     []string{"f"},
 							Required:    true,
+						},
+						&cli.StringSliceFlag{
+							Name:        "include-option",
+							Usage:       "Include this option to filter on, e.g. --include-option 'go_package=api'",
+							Aliases:     []string{"io"},
+							DefaultText: "",
+							Required:    false,
+						},
+						&cli.BoolFlag{
+							Name:        "pretty",
+							Usage:       "Pretty prints the output, export --pretty",
+							DefaultText: "",
 						},
 						&cli.StringFlag{
 							Name:        "source",
@@ -97,25 +111,45 @@ func main() {
 					Action: func(c *cli.Context) error {
 						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString(c.String("file")))
 
+						if len(c.StringSlice("exclude-option")) != 0 && len(c.StringSlice("include-option")) != 0 {
+							fmt.Printf("%s %s\n", color.HiRedString("==>"), color.HiWhiteString("❌ Please use 'exclude-option' or 'include-option' only"))
+							os.Exit(1)
+						}
+
 						// Get files
 						files, err := getFiles(c.String("source"), ".proto")
 						if err != nil {
-							panic(err)
+							fmt.Println(err)
 						}
 
 						// Return filtered files
 						ff, err := searchFiles(files, "Request) returns")
 						if err != nil {
-							panic(err)
+							fmt.Println(err)
 						}
 
 						// Parse the protos
 						parseFiles(ff)
 
 						// Generate object to export
-						obj, err := generateExport(ff)
-						if err != nil {
-							panic(err)
+						var obj *ProtoExport
+						if len(c.StringSlice("exclude-option")) != 0 {
+							fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Using Filter '"), color.HiGreenString("exclude"), color.HiWhiteString("'"))
+							obj, err = generateExport(ff, c.StringSlice("exclude-option"), "exclude")
+							if err != nil {
+								fmt.Println(err)
+							}
+						} else if len(c.StringSlice("include-option")) != 0 {
+							fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Using Filter '"), color.HiGreenString("include"), color.HiWhiteString("'"))
+							obj, err = generateExport(ff, c.StringSlice("include-option"), "include")
+							if err != nil {
+								fmt.Println(err)
+							}
+						} else {
+							obj, err = generateExport(ff, nil, "")
+							if err != nil {
+								fmt.Println(err)
+							}
 						}
 
 						// Forat the obj
@@ -138,9 +172,23 @@ func main() {
 					Aliases: []string{"p"},
 					Usage:   "Prints the proto defintions to console",
 					Flags: []cli.Flag{
+						&cli.StringSliceFlag{
+							Name:        "exclude-option",
+							Usage:       "Exclude this option to filter on, e.g. --exclude-option 'deprecated=true'",
+							Aliases:     []string{"eo"},
+							DefaultText: "",
+							Required:    false,
+						},
+						&cli.StringSliceFlag{
+							Name:        "include-option",
+							Usage:       "Include this option to filter on, e.g. --include-option 'go_package=api'",
+							Aliases:     []string{"io"},
+							DefaultText: "",
+							Required:    false,
+						},
 						&cli.BoolFlag{
 							Name:        "pretty",
-							Usage:       "Pretty prints the output, print --pretty",
+							Usage:       "Pretty prints the output,  --pretty",
 							DefaultText: "",
 						},
 						&cli.StringFlag{
@@ -154,25 +202,45 @@ func main() {
 					Action: func(c *cli.Context) error {
 						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString(c.String("file")))
 
+						if len(c.StringSlice("exclude-option")) != 0 && len(c.StringSlice("include-option")) != 0 {
+							fmt.Printf("%s %s\n", color.HiRedString("==>"), color.HiWhiteString("❌ Please use 'exclude-option' or 'include-option' only"))
+							os.Exit(1)
+						}
+
 						// Get files
 						files, err := getFiles(c.String("source"), ".proto")
 						if err != nil {
-							panic(err)
+							fmt.Println(err)
 						}
 
 						// Return filtered files
 						ff, err := searchFiles(files, "Request) returns")
 						if err != nil {
-							panic(err)
+							fmt.Println(err)
 						}
 
 						// Parse the protos
 						parseFiles(ff)
 
 						// Generate object to export
-						obj, err := generateExport(ff)
-						if err != nil {
-							panic(err)
+						var obj *ProtoExport
+						if len(c.StringSlice("exclude-option")) != 0 {
+							fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Using Filter '"), color.HiGreenString("exclude"), color.HiWhiteString("'"))
+							obj, err = generateExport(ff, c.StringSlice("exclude-option"), "exclude")
+							if err != nil {
+								fmt.Println(err)
+							}
+						} else if len(c.StringSlice("include-option")) != 0 {
+							fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Using Filter '"), color.HiGreenString("include"), color.HiWhiteString("'"))
+							obj, err = generateExport(ff, c.StringSlice("include-option"), "include")
+							if err != nil {
+								fmt.Println(err)
+							}
+						} else {
+							obj, err = generateExport(ff, nil, "")
+							if err != nil {
+								fmt.Println(err)
+							}
 						}
 
 						// Forat the obj
@@ -225,17 +293,31 @@ func main() {
 						// 	DefaultText: "--openslo=false",
 						// 	Aliases:     []string{"slo"},
 						// },
+						&cli.StringSliceFlag{
+							Name:        "exclude-option",
+							Usage:       "Exclude this option to filter on, e.g. --exclude-option 'deprecated=true'",
+							Aliases:     []string{"eo"},
+							DefaultText: "",
+							Required:    false,
+						},
 						&cli.StringFlag{
 							Name:        "file",
-							Usage:       "The exported file",
-							DefaultText: "./foobar_protos.yaml",
+							Usage:       "The exported file, e.g. ./foobar_protos.yaml",
+							DefaultText: "",
 							Aliases:     []string{"f"},
 							Required:    true,
 						},
+						&cli.StringSliceFlag{
+							Name:        "include-option",
+							Usage:       "Include this option to filter on, e.g. --include-option 'go_package=api'",
+							Aliases:     []string{"io"},
+							DefaultText: "",
+							Required:    false,
+						},
 						&cli.StringFlag{
 							Name:        "source",
-							Usage:       "The source directory",
-							DefaultText: "~/foobar/proto",
+							Usage:       "The source directory, e.g. ~/foobar/proto",
+							DefaultText: "",
 							Aliases:     []string{"s"},
 							Required:    true,
 						},
@@ -243,25 +325,45 @@ func main() {
 					Action: func(c *cli.Context) error {
 						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString(c.String("file")))
 
+						if len(c.StringSlice("exclude-option")) != 0 && len(c.StringSlice("include-option")) != 0 {
+							fmt.Printf("%s %s\n", color.HiRedString("==>"), color.HiWhiteString("❌ Please use 'exclude-option' or 'include-option' only"))
+							os.Exit(1)
+						}
+
 						// Get files
 						files, err := getFiles(c.String("source"), ".proto")
 						if err != nil {
-							panic(err)
+							fmt.Println(err)
 						}
 
 						// Return filtered files
 						ff, err := searchFiles(files, "Request) returns")
 						if err != nil {
-							panic(err)
+							fmt.Println(err)
 						}
 
 						// Parse the protos
 						parseFiles(ff)
 
 						// Generate object to export
-						obj, err := generateExport(ff)
-						if err != nil {
-							panic(err)
+						var obj *ProtoExport
+						if len(c.StringSlice("exclude-option")) != 0 {
+							fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Using Filter '"), color.HiGreenString("exclude"), color.HiWhiteString("'"))
+							obj, err = generateExport(ff, c.StringSlice("exclude-option"), "exclude")
+							if err != nil {
+								fmt.Println(err)
+							}
+						} else if len(c.StringSlice("include-option")) != 0 {
+							fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Using Filter '"), color.HiGreenString("include"), color.HiWhiteString("'"))
+							obj, err = generateExport(ff, c.StringSlice("include-option"), "include")
+							if err != nil {
+								fmt.Println(err)
+							}
+						} else {
+							obj, err = generateExport(ff, nil, "")
+							if err != nil {
+								fmt.Println(err)
+							}
 						}
 
 						// Print obj
@@ -278,36 +380,70 @@ func main() {
 					Aliases: []string{"p"},
 					Usage:   "Prints the proto defintions to console",
 					Flags: []cli.Flag{
+						&cli.StringSliceFlag{
+							Name:        "exclude-option",
+							Usage:       "Exclude this option to filter on, e.g. --exclude-option 'deprecated=true'",
+							Aliases:     []string{"eo"},
+							DefaultText: "",
+							Required:    false,
+						},
+						&cli.StringSliceFlag{
+							Name:        "include-option",
+							Usage:       "Include this option to filter on, e.g. --include-option 'go_package=api'",
+							Aliases:     []string{"io"},
+							DefaultText: "",
+							Required:    false,
+						},
 						&cli.StringFlag{
 							Name:        "source",
-							Usage:       "The source directory",
-							DefaultText: "~/foobar/proto",
+							Usage:       "The source directory, e.g. ~/foobar/proto",
+							DefaultText: "",
 							Aliases:     []string{"s"},
 							Required:    true,
 						},
 					},
 					Action: func(c *cli.Context) error {
-						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString(c.String("file")))
+						fmt.Printf("%s %s %s %s %s\n", color.GreenString("==>"), color.HiWhiteString("✨ Using Source:"), color.HiGreenString(c.String("source")), color.HiWhiteString("Destination:"), color.HiGreenString("console"))
+
+						if len(c.StringSlice("exclude-option")) != 0 && len(c.StringSlice("include-option")) != 0 {
+							fmt.Printf("%s %s\n", color.HiRedString("==>"), color.HiWhiteString("❌ Please use 'exclude-option' or 'include-option' only"))
+							os.Exit(1)
+						}
 
 						// Get files
 						files, err := getFiles(c.String("source"), ".proto")
 						if err != nil {
-							panic(err)
+							fmt.Println(err)
 						}
 
 						// Return filtered files
 						ff, err := searchFiles(files, "Request) returns")
 						if err != nil {
-							panic(err)
+							fmt.Println(err)
 						}
 
 						// Parse the protos
 						parseFiles(ff)
 
 						// Generate object to export
-						obj, err := generateExport(ff)
-						if err != nil {
-							panic(err)
+						var obj *ProtoExport
+						if len(c.StringSlice("exclude-option")) != 0 {
+							fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Using Filter '"), color.HiGreenString("exclude"), color.HiWhiteString("'"))
+							obj, err = generateExport(ff, c.StringSlice("exclude-option"), "exclude")
+							if err != nil {
+								fmt.Println(err)
+							}
+						} else if len(c.StringSlice("include-option")) != 0 {
+							fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Using Filter '"), color.HiGreenString("include"), color.HiWhiteString("'"))
+							obj, err = generateExport(ff, c.StringSlice("include-option"), "include")
+							if err != nil {
+								fmt.Println(err)
+							}
+						} else {
+							obj, err = generateExport(ff, nil, "")
+							if err != nil {
+								fmt.Println(err)
+							}
 						}
 
 						// Print obj
@@ -330,7 +466,8 @@ func main() {
 	}
 }
 
-func generateExport(files []string) (*ProtoExport, error) {
+// generateExport a filtered object, don't @ me :P
+func generateExport(files, filter []string, filterType string) (*ProtoExport, error) {
 	pe := &ProtoExport{}
 	pe.Version = buildVersion
 
@@ -341,52 +478,180 @@ func generateExport(files []string) (*ProtoExport, error) {
 		parser := proto.NewParser(reader)
 		definition, _ := parser.Parse()
 
-		// only one package per file, keep track to add services to this package
-		var index int
-		for _, e := range definition.Elements {
-			if p, ok := e.(*proto.Package); ok {
-				index, ok = findPackage(pe.Packages, p.Name)
-				if !ok {
-					pe.Packages = append(pe.Packages, PackageItem{
-						Package: p.Name,
-					})
-					index = len(pe.Packages) - 1
-				}
-				// only one package per file so can break
-				break
+		// Use filters or not
+		if len(filter) != 0 {
+			// Validate = assignment
+			filSplit := strings.Split(filter[0], "=")
+			if len(filSplit) < 2 {
+				fmt.Printf("%s %s\n", color.HiRedString("==>"), color.HiWhiteString("❌ Please use '=' for assignment of options"))
+				os.Exit(1)
 			}
+
+			//TODO(krzko): Dodgy exclude, I don't know why
+			add := false
+			// Filters
+			switch filterType {
+			case "exclude":
+				proto.Walk(definition,
+					proto.WithOption(func(o *proto.Option) {
+						// fmt.Printf("%v - %v - %v\n", f, filter, filterType)
+						// Split option to get option k,v
+						ck := fmt.Sprintf("%v", o.Constant)
+						cv := strings.Split(ck, " ")
+
+						// Compare flags to option value
+						if o.Name == filSplit[0] && cv[1] == filSplit[1] {
+							fmt.Printf("%s %s %v\n", color.BlueString("==>"), color.HiWhiteString("Excluding:"), f)
+							add = false
+						} else {
+							add = true
+						}
+					}))
+				//TODO(krzko): Had to implement this as it iterated over options continually
+				if add {
+					// only one package per file, keep track to add services to this package
+					var index int
+					for _, e := range definition.Elements {
+						if p, ok := e.(*proto.Package); ok {
+							index, ok = findPackage(pe.Packages, p.Name)
+							if !ok {
+								pe.Packages = append(pe.Packages, PackageItem{
+									Package: p.Name,
+								})
+								index = len(pe.Packages) - 1
+							}
+							// only one package per file so can break
+							break
+						}
+					}
+					proto.Walk(definition,
+						proto.WithService(func(s *proto.Service) {
+							check := containsService(pe.Packages[index].Services, s.Name)
+							if !check {
+								pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
+									Service: s.Name,
+								})
+							}
+						}),
+						proto.WithRPC(func(rpc *proto.RPC) {
+							parent, ok := rpc.Parent.(*proto.Service)
+							if !ok {
+								return
+							}
+
+							i, check := findService(pe.Packages[index].Services, parent.Name)
+							if check {
+								pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, rpc.Name)
+							} else {
+								// Add service and rpc
+								pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
+									Service: parent.Name,
+									RPCs:    []string{rpc.Name},
+								})
+							}
+						}))
+				}
+			case "include":
+				proto.Walk(definition,
+					proto.WithOption(func(o *proto.Option) {
+						// Split option to get option k,v
+						ck := fmt.Sprintf("%v", o.Constant)
+						cv := strings.Split(ck, " ")
+
+						// Compare flags to option value
+						if o.Name == filSplit[0] && cv[1] == filSplit[1] {
+							fmt.Printf("%s %s %v\n", color.BlueString("==>"), color.HiWhiteString("Including:"), f)
+
+							// only one package per file, keep track to add services to this package
+							var index int
+							for _, e := range definition.Elements {
+								if p, ok := e.(*proto.Package); ok {
+									index, ok = findPackage(pe.Packages, p.Name)
+									if !ok {
+										pe.Packages = append(pe.Packages, PackageItem{
+											Package: p.Name,
+										})
+										index = len(pe.Packages) - 1
+									}
+									// only one package per file so can break
+									break
+								}
+							}
+							proto.Walk(definition,
+								proto.WithService(func(s *proto.Service) {
+									check := containsService(pe.Packages[index].Services, s.Name)
+									if !check {
+										pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
+											Service: s.Name,
+										})
+									}
+								}),
+								proto.WithRPC(func(rpc *proto.RPC) {
+									parent, ok := rpc.Parent.(*proto.Service)
+									if !ok {
+										return
+									}
+
+									i, check := findService(pe.Packages[index].Services, parent.Name)
+									if check {
+										pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, rpc.Name)
+									} else {
+										// Add service and rpc
+										pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
+											Service: parent.Name,
+											RPCs:    []string{rpc.Name},
+										})
+									}
+								}))
+						}
+					}))
+			}
+		} else {
+			// only one package per file, keep track to add services to this package
+			var index int
+			for _, e := range definition.Elements {
+				if p, ok := e.(*proto.Package); ok {
+					index, ok = findPackage(pe.Packages, p.Name)
+					if !ok {
+						pe.Packages = append(pe.Packages, PackageItem{
+							Package: p.Name,
+						})
+						index = len(pe.Packages) - 1
+					}
+					// only one package per file so can break
+					break
+				}
+			}
+			proto.Walk(definition,
+				proto.WithService(func(s *proto.Service) {
+					check := containsService(pe.Packages[index].Services, s.Name)
+					if !check {
+						pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
+							Service: s.Name,
+						})
+					}
+				}),
+				proto.WithRPC(func(rpc *proto.RPC) {
+					parent, ok := rpc.Parent.(*proto.Service)
+					if !ok {
+						return
+					}
+
+					i, check := findService(pe.Packages[index].Services, parent.Name)
+					if check {
+						pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, rpc.Name)
+					} else {
+						// Add service and rpc
+						pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
+							Service: parent.Name,
+							RPCs:    []string{rpc.Name},
+						})
+					}
+				}))
+
 		}
-
-		proto.Walk(definition,
-			proto.WithService(func(s *proto.Service) {
-				check := containsService(pe.Packages[index].Services, s.Name)
-				if !check {
-					pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
-						Service: s.Name,
-					})
-				}
-			}),
-			proto.WithRPC(func(rpc *proto.RPC) {
-				parent, ok := rpc.Parent.(*proto.Service)
-				if !ok {
-					return
-				}
-
-				i, check := findService(pe.Packages[index].Services, parent.Name)
-				if check {
-					pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, rpc.Name)
-				} else {
-					// Add service and rpc
-					pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
-						Service: parent.Name,
-						RPCs:    []string{rpc.Name},
-					})
-				}
-			}))
 	}
-
 	return pe, nil
-
 }
 
 func getFiles(root, extension string) ([]string, error) {
@@ -443,7 +708,7 @@ func parseFiles(files []string) {
 	for _, f := range files {
 		reader, err := os.Open(f)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 		defer reader.Close()
 
@@ -522,7 +787,8 @@ func searchFiles(files []string, filter string) ([]string, error) {
 		}
 
 		f := string(data)
-		if strings.Contains(f, "Request) returns (stream") {
+		//TODO(krzko): Better filter for stream/unary RPCs
+		if strings.Contains(f, "Request) returns (stream....") {
 			// Skip streams
 		} else if strings.Contains(f, filter) {
 			found = append(found, file)

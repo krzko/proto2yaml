@@ -12,7 +12,7 @@ ARG NOW
 ARG VERSION
 LABEL maintainer="Kristof Kowalski <k@ko.wal.ski>" \
     org.opencontainers.image.title="proto2yaml" \
-    org.opencontainers.image.description="A command-line utility to convert Protocol Buffers (proto) files to YAML" \
+    org.opencontainers.image.description="A command-line utility to export Protocol Buffers (proto) files to YAML, and JSON" \
     org.opencontainers.image.authors="Kristof Kowalski <k@ko.wal.ski>" \
     org.opencontainers.image.vendor="Kristof Kowalski" \
     org.opencontainers.image.documentation="https://github.com/krzko/proto2yaml/docs" \

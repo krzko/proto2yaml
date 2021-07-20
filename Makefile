@@ -2,7 +2,8 @@
 
 OUTPUT:=bin
 EXECUTABLE:=proto2yaml
-DOCKER_REGISTRY:=ghcr.io/krzko
+DOCKER_REGISTRY:=ghcr.io
+DOCKER_USER:=krzko
 
 VERSION:=0.0.2
 COMMIT=$(shell git describe --tags --always --long)
@@ -91,9 +92,9 @@ build-windows:
 	@echo
 
 build-docker:
-	@echo "  🐳  Building docker image ${DOCKER_REGISTRY}/${USER}/${EXECUTABLE}:${VERSION}..."
-	@docker image build --build-arg "COMMIT=${COMMIT}" --build-arg "NOW=${NOW}" --build-arg "VERSION=${VERSION}" -t "${DOCKER_REGISTRY}/${USER}/${EXECUTABLE}:${VERSION}" .
-	@echo "  ✨  Build docker image ${DOCKER_REGISTRY}/${USER}/${EXECUTABLE}:${VERSION} complete"
+	@echo "  🐳  Building docker image ${DOCKER_REGISTRY}/${DOCKER_USER}/${EXECUTABLE}:${VERSION}..."
+	@docker image build --build-arg "COMMIT=${COMMIT}" --build-arg "NOW=${NOW}" --build-arg "VERSION=${VERSION}" -t "${DOCKER_REGISTRY}/${DOCKER_USER}/${EXECUTABLE}:${VERSION}" .
+	@echo "  ✨  Build docker image ${DOCKER_REGISTRY}/${DOCKER_USER}/${EXECUTABLE}:${VERSION} complete"
 	@echo
 
 clean:
@@ -107,9 +108,9 @@ fmt:
 	go fmt ./...
 
 push-docker:
-	@echo "  🐳  Pushing docker image ${DOCKER_REGISTRY}/${USER}/${EXECUTABLE}:${VERSION}..."
-	@docker push "${DOCKER_REGISTRY}/${USER}/${EXECUTABLE}:${VERSION}"
-	@echo "  ✨  Docker image ${DOCKER_REGISTRY}/${USER}/${EXECUTABLE}:${VERSION} pushed"
+	@echo "  🐳  Pushing docker image ${DOCKER_REGISTRY}/${DOCKER_USER}/${EXECUTABLE}:${VERSION}..."
+	@docker push "${DOCKER_REGISTRY}/${DOCKER_USER}/${EXECUTABLE}:${VERSION}"
+	@echo "  ✨  Docker image ${DOCKER_REGISTRY}/${DOCKER_USER}/${EXECUTABLE}:${VERSION} pushed"
 	@echo
 
 run:

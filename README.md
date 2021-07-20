@@ -25,7 +25,6 @@ Addition features such as filtering and [OpenSLO](https://github.com/OpenSLO/Ope
 Download the latest [release](https://github.com/krzko/proto2yaml/releases).
 
 ```sh
-$ ./proto2yaml
 NAME:
    proto2yaml - A command-line utility to convert Protocol Buffers (proto) files to YAML
 
@@ -51,12 +50,12 @@ To export to a file, run the following command
 
 ```sh
 # json
-$ ./proto2yaml json export --source ./protos --file ./example_protos.json
+proto2yaml json export --source ./protos --file ./example_protos.json
 # json pretty
-$ ./proto2yaml json export --source ./protos --file ./example_protos.json --pretty
+proto2yaml json export --source ./protos --file ./example_protos.json --pretty
 
 # yaml
-$ ./proto2yaml yaml export --source ./protos --file ./example_protos.yaml
+proto2yaml yaml export --source ./protos --file ./example_protos.yaml
 ```
 
 ### Filter
@@ -64,13 +63,13 @@ $ ./proto2yaml yaml export --source ./protos --file ./example_protos.yaml
 To filter on an `option` you can use the `--exclude-option` or `--include-option` filter. For now its based on singletons but hope to expand out multiple combinations in the future. An example is as follows:
 
 ```sh
-$ proto2yaml yaml print --source ./protos --exclude-option "deprecated=true"
+proto2yaml yaml print --source ./protos --exclude-option "deprecated=true"
 ```
 
 Or run the inverse of the above using:
 
 ```sh
-$ proto2yaml yaml print --source ./protos --include-option "deprecated=true"
+proto2yaml yaml print --source ./protos --include-option "deprecated=true"
 ```
 
 ### Print
@@ -79,12 +78,12 @@ To print to the console, clone the repo and run the following command:
 
 ```sh
 # json
-$ ./proto2yaml json print --source ./protos
+proto2yaml json print --source ./protos
 # json pretty
-$ ./proto2yaml json print --source ./protos --pretty
+proto2yaml json print --source ./protos --pretty
 
 # yaml
-$ ./proto2yaml yaml print --source ./protos
+proto2yaml yaml print --source ./protos
 ```
 
 ### Disable Colour

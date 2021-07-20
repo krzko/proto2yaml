@@ -109,7 +109,7 @@ To build to the binaries use the following targets. All outputs are generated to
 
 To build all the the targets, simply run:
 
-``sh
+```sh
 make build
 ```
 

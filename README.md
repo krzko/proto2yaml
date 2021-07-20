@@ -14,9 +14,9 @@ Supported filters are for:
 
 ## Overview
 
-We needed and intermediatate format to allow us to provision [Service Level Objectives](https://cloud.google.com/service-mesh/docs/observability/slo-overview) resources using [terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/monitoring_slo).
+We needed an intermediatate format to allow us to provision [Service Level Objective](https://cloud.google.com/service-mesh/docs/observability/slo-overview) resources using [terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/monitoring_slo).
 
-The idea is to enumerate the associated protos and parse the export using a `yamldecode()` or `jsondecode()` function and prepolute our vars.
+The idea is to enumerate the associated protos and parse the export using a `yamldecode()` or `jsondecode()` function and prepolute our variables.
 
 Addition features such as filtering and [OpenSLO](https://github.com/OpenSLO/OpenSLO) export formating coming.
 

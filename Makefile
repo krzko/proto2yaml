@@ -22,7 +22,7 @@ all: clean build
 
 build: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux build-windows build-docker
 
-build-aardvark: clean build-darwin-amd64
+build-no-docker: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux build-windows
 
 build-arm: 
 	@echo "  🍒  Building binary ${ARM5}..."

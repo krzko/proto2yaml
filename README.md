@@ -100,3 +100,38 @@ To enable colour again, simply `unset` the variable:
 ```sh
 unset NO_COLOR
 ```
+
+## Build & Run
+
+To build to the binaries use the following targets. All outputs are generated to the `bin` directory.
+
+### Linux
+
+The following targets will generate your Linux binaries:
+
+```sh
+build-linux
+```
+
+### macOS
+
+macOS has two targets, one for the older Intel `amd64` CPUs and one for the newer Mx `arm64` CPUs. The following targets will generate your binaries:
+
+```sh
+# For intel macs
+make build-darwin-amd64
+# For m1 macs
+make build-darwin-arm64
+```
+
+### Windows
+
+The following targets will generate your Windows executable:
+
+```sh
+build-windows
+```
+
+### Others
+
+The general `make build` and `back-build-no-docker` targets will also build **Raspberry Pi** and **FreeBSD** version, along with a **distroless Docker** image, if selected.

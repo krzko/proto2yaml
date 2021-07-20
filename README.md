@@ -105,6 +105,20 @@ unset NO_COLOR
 
 To build to the binaries use the following targets. All outputs are generated to the `bin` directory.
 
+### All
+
+To build all the the targets, simply run:
+
+``sh
+make build
+```
+
+To run all the builds without Docker, simply run:
+
+```sh
+make build-no-docker
+```
+
 ### Linux
 
 The following targets will generate your Linux binaries:
@@ -129,7 +143,7 @@ make build-darwin-arm64
 The following targets will generate your Windows executable:
 
 ```sh
-build-windows
+make build-windows
 ```
 
 ### Others

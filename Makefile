@@ -5,19 +5,19 @@ EXECUTABLE:=proto2yaml
 DOCKER_REGISTRY:=ghcr.io
 DOCKER_USER:=krzko
 
-VERSION:=0.0.3
+VERSION:=v0.0.3
 COMMIT=$(shell git describe --tags --always --long)
 NOW=$(shell date +'%Y%m%d')
 
-ARM5:=${EXECUTABLE}_v${VERSION}_linux_arm_5
-ARM6:=${EXECUTABLE}_v${VERSION}_linux_arm_6
-ARM7:=${EXECUTABLE}_v${VERSION}_linux_arm_7
-ARM8:=${EXECUTABLE}_v${VERSION}_linux_arm64_8
-DARWIN_AMD64:=${EXECUTABLE}_v${VERSION}_darwin_amd64
-DARWIN_ARM64:=${EXECUTABLE}_v${VERSION}_darwin_arm64
-FREEBSD:=${EXECUTABLE}_v${VERSION}_freebsd_amd64
-LINUX:=${EXECUTABLE}_v${VERSION}_linux_amd64
-WINDOWS:=${EXECUTABLE}_v${VERSION}_windows_amd64
+ARM5:=${EXECUTABLE}_${VERSION}_linux_arm_5
+ARM6:=${EXECUTABLE}_${VERSION}_linux_arm_6
+ARM7:=${EXECUTABLE}_${VERSION}_linux_arm_7
+ARM8:=${EXECUTABLE}_${VERSION}_linux_arm64_8
+DARWIN_AMD64:=${EXECUTABLE}_${VERSION}_darwin_amd64
+DARWIN_ARM64:=${EXECUTABLE}_${VERSION}_darwin_arm64
+FREEBSD:=${EXECUTABLE}_${VERSION}_freebsd_amd64
+LINUX:=${EXECUTABLE}_${VERSION}_linux_amd64
+WINDOWS:=${EXECUTABLE}_${VERSION}_windows_amd64
 
 all: clean build
 

@@ -58,9 +58,9 @@ func main() {
 		Name:      appName,
 		Usage:     "A command-line utility to convert Protocol Buffers (proto) files to YAML",
 		UsageText: appName + " [global options] command [command options] [arguments...]",
-		Version:   "v" + buildVersion,
+		Version:   buildVersion,
 		CommandNotFound: func(c *cli.Context, command string) {
-			fmt.Fprintf(c.App.Writer, "pro2yaml: Command not found: %q\n", command)
+			fmt.Fprintf(c.App.Writer, "proto2yaml: Command not found: %q\n", command)
 		},
 	}
 

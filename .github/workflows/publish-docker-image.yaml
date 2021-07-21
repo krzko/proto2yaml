@@ -19,6 +19,18 @@ jobs:
       packages: write
 
     steps:
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d-%H%M%S')"
+
+      - name: Set short sha
+        id: shortsha
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Get latest tag
+        id: latesttag
+        run: echo "::set-output name=latest_tag::$(git describe --abbrev=0 --tags)"
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -48,6 +60,10 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2.6.1
         with:
+          build-args: |
+            COMMIT=${{ steps.shortsha.outputs.sha_short }}
+            NOW=${{ steps.date.outputs.date }}
+            VERSION=${{ steps.latesttag.outputs.latest_tag }}
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}

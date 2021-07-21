@@ -22,7 +22,7 @@ Addition features such as filtering and [OpenSLO](https://github.com/OpenSLO/Ope
 
 ## Getting started
 
-Download the latest [release](https://github.com/krzko/proto2yaml/releases).
+Running `proto2yaml` is availabile through several methods. You can download it as a binary from GitHub releases, running it as a distroless docker image or building it from source.
 
 ```sh
 NAME:
@@ -44,17 +44,43 @@ GLOBAL OPTIONS:
    --version, -v  print the version (default: false)
 ```
 
+## Download Binary
+
+Download the latest [release](https://github.com/krzko/proto2yaml/releases).
+
+## Docker
+
+Attach a [bind mount](https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount) to the source directory and the directory you want to export the file to.
+
+```sh
+# Use current directory as source
+docker run --rm \
+    -v "$(pwd)":/searchme \
+    ghcr.io/krzko/proto2yaml:latest yaml print --source /searchme
+
+# Use an explicit path as source
+docker run --rm \
+    -v "/Users/foobar/code/protos":/searchme \
+    ghcr.io/krzko/proto2yaml:latest yaml print --source /searchme
+
+# Use an explicit path as source and current as export
+docker run --rm \
+    -v "/Users/foobar/code/protos":/searchme \
+    -v "$(pwd)":/save \
+    ghcr.io/krzko/proto2yaml:latest yaml print --source /searchme --file /save/example_protos.yaml
+```
+
 ### Export
 
 To export to a file, run the following command
 
 ```sh
-# json
+# JSON
 proto2yaml json export --source ./protos --file ./example_protos.json
-# json pretty
+# JSON pretty
 proto2yaml json export --source ./protos --file ./example_protos.json --pretty
 
-# yaml
+# YAML
 proto2yaml yaml export --source ./protos --file ./example_protos.yaml
 ```
 
@@ -77,12 +103,12 @@ proto2yaml yaml print --source ./protos --include-option "deprecated=true"
 To print to the console, clone the repo and run the following command:
 
 ```sh
-# json
+# JSON
 proto2yaml json print --source ./protos
-# json pretty
+# JSON pretty
 proto2yaml json print --source ./protos --pretty
 
-# yaml
+# YAML
 proto2yaml yaml print --source ./protos
 ```
 

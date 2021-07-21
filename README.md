@@ -35,8 +35,8 @@ VERSION:
    0.0.2
 
 COMMANDS:
-   json     The outputs are formatted as a JSON
-   yaml     The outputs are formatted as a YAML
+   json     The outputs are formatted as JSON
+   yaml     The outputs are formatted as YAML
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:

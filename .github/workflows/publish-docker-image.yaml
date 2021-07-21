@@ -26,7 +26,6 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=localhost:5000/name/app
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly
@@ -80,7 +79,7 @@ jobs:
         with:
           build-args: |
             COMMIT=${{ github.sha }}
-            NOW=${{ steps.date.outputs.date }}
+            NOW=${{ steps.prep.outputs.date }}
             VERSION=${{ steps.prep.outputs.version }}
           context: .
           push: true

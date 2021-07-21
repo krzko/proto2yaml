@@ -5,7 +5,7 @@ EXECUTABLE:=proto2yaml
 DOCKER_REGISTRY:=ghcr.io
 DOCKER_USER:=krzko
 
-VERSION:=0.0.2
+VERSION:=0.0.3
 COMMIT=$(shell git describe --tags --always --long)
 NOW=$(shell date +'%Y%m%d')
 
@@ -25,25 +25,25 @@ build: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux
 
 build-no-docker: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux build-windows
 
-build-arm: 
+build-arm:
 	@echo "  🍒  Building binary ${ARM5}..."
 	@[ -d "${OUTPUT}/${ARM5}" ] || mkdir -p "${OUTPUT}/${ARM5}"
 	@env GOOS=linux GOARCH=arm GOARM=5 go build -o "${OUTPUT}/${ARM5}/${EXECUTABLE}" -ldflags="-s -w -X main.buildVersion=${VERSION} -X main.commit=${COMMIT} -X main.date=${NOW}" cmd/${EXECUTABLE}/main.go
 	@tar -czf "${OUTPUT}/${ARM5}.tar.gz" "${OUTPUT}/${ARM5}/${EXECUTABLE}"
 	@echo "  ✨  Build binary ${ARM5} complete"
-	
+
 	@echo "  🍒  Building binary ${ARM6}..."
 	@[ -d "${OUTPUT}/${ARM6}" ] || mkdir -p "${OUTPUT}/${ARM6}"
 	@env GOOS=linux GOARCH=arm GOARM=6 go build -o "${OUTPUT}/${ARM6}/${EXECUTABLE}" -ldflags="-s -w -X main.buildVersion=${VERSION} -X main.commit=${COMMIT} -X main.date=${NOW}" cmd/${EXECUTABLE}/main.go
 	@tar -czf "${OUTPUT}/${ARM6}.tar.gz" "${OUTPUT}/${ARM6}/${EXECUTABLE}"
 	@echo "  ✨  Build binary ${ARM6} complete"
-	
+
 	@echo "  🍒  Building binary ${ARM7}..."
 	@[ -d "${OUTPUT}/${ARM7}" ] || mkdir -p "${OUTPUT}/${ARM7}"
 	@env GOOS=linux GOARCH=arm GOARM=7 go build -o "${OUTPUT}/${ARM7}/${EXECUTABLE}" -ldflags="-s -w -X main.buildVersion=${VERSION} -X main.commit=${COMMIT} -X main.date=${NOW}" cmd/${EXECUTABLE}/main.go
 	@tar -czf "${OUTPUT}/${ARM7}.tar.gz" "${OUTPUT}/${ARM7}/${EXECUTABLE}"
 	@echo "  ✨  Build binary ${ARM7} complete"
-	
+
 	@echo "  🍒  Building binary${ARM8}..."
 	@[ -d "${OUTPUT}/${ARM8}" ] || mkdir -p "${OUTPUT}/${ARM8}"
 	@env GOOS=linux GOARCH=arm64 go build -o "${OUTPUT}/${ARM8}/${EXECUTABLE}" -ldflags="-s -w -X main.buildVersion=${VERSION} -X main.commit=${COMMIT} -X main.date=${NOW}" cmd/${EXECUTABLE}/main.go
@@ -67,7 +67,7 @@ build-darwin-arm64:
 	@echo "  ✨  Build binary ${DARWIN_ARM64} complete"
 	@echo
 
-build-freebsd: 
+build-freebsd:
 	@echo "  👿  Building binary ${FREEBSD}..."
 	@[ -d "${OUTPUT}/${FREEBSD}" ] || mkdir -p "${OUTPUT}/${FREEBSD}"
 	@env GOOS=freebsd GOARCH=amd64 go build -o "${OUTPUT}/${FREEBSD}/${EXECUTABLE}" -ldflags="-s -w -X main.buildVersion=${VERSION} -X main.commit=${COMMIT} -X main.date=${NOW}" cmd/${EXECUTABLE}/main.go
@@ -75,7 +75,7 @@ build-freebsd:
 	@echo "  ✨  Build binary ${FREEBSD} complete"
 	@echo
 
-build-linux: 
+build-linux:
 	@echo "  🐧  Building binary ${LINUX}..."
 	@[ -d "${OUTPUT}/${LINUX}" ] || mkdir -p "${OUTPUT}/${LINUX}"
 	@env GOOS=linux GOARCH=amd64 go build -o "${OUTPUT}/${LINUX}/${EXECUTABLE}" -ldflags="-s -w -X main.buildVersion=${VERSION} -X main.commit=${COMMIT} -X main.date=${NOW}" cmd/${EXECUTABLE}/main.go

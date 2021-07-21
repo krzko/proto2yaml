@@ -32,7 +32,7 @@ USAGE:
    proto2yaml [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.2
+   0.0.3
 
 COMMANDS:
    json     The outputs are formatted as JSON

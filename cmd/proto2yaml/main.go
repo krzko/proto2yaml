@@ -67,7 +67,7 @@ func main() {
 	app.Commands = cli.Commands{
 		{
 			Name:  "json",
-			Usage: "The outputs are formatted as a JSON",
+			Usage: "The outputs are formatted as JSON",
 			Subcommands: []*cli.Command{
 				{
 					Name:    "export",
@@ -264,7 +264,7 @@ func main() {
 		},
 		// {
 		// 	Name:  "toml",
-		// 	Usage: "The outputs are formatted as a TOML",
+		// 	Usage: "The outputs are formatted as TOML",
 		// 	Subcommands: []*cli.Command{
 		// 		{
 		// 			Name:    "print",
@@ -280,7 +280,7 @@ func main() {
 		// },
 		{
 			Name:  "yaml",
-			Usage: "The outputs are formatted as a YAML",
+			Usage: "The outputs are formatted as YAML",
 			Subcommands: []*cli.Command{
 				{
 					Name:    "export",

@@ -33,8 +33,12 @@ type PackageItem struct {
 	Services []ServiceItem `json:"services" yaml:"services"`
 }
 type ServiceItem struct {
-	Service string   `json:"service" yaml:"service"`
-	RPCs    []string `json:"rpc" yaml:"rpc"`
+	Service string    `json:"service" yaml:"service"`
+	RPCs    []RPCItem `json:"rpc" yaml:"rpc"`
+}
+
+type RPCItem struct {
+	Name string `json:"name" yaml:"name"`
 }
 
 func main() {
@@ -541,12 +545,12 @@ func generateExport(files, filter []string, filterType string) (*ProtoExport, er
 
 							i, check := findService(pe.Packages[index].Services, parent.Name)
 							if check {
-								pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, rpc.Name)
+								pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name})
 							} else {
 								// Add service and rpc
 								pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
 									Service: parent.Name,
-									RPCs:    []string{rpc.Name},
+									RPCs:    []RPCItem{RPCItem{Name: rpc.Name}},
 								})
 							}
 						}))
@@ -594,12 +598,12 @@ func generateExport(files, filter []string, filterType string) (*ProtoExport, er
 
 									i, check := findService(pe.Packages[index].Services, parent.Name)
 									if check {
-										pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, rpc.Name)
+										pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name})
 									} else {
 										// Add service and rpc
 										pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
 											Service: parent.Name,
-											RPCs:    []string{rpc.Name},
+											RPCs:    []RPCItem{RPCItem{Name: rpc.Name}},
 										})
 									}
 								}))
@@ -639,12 +643,12 @@ func generateExport(files, filter []string, filterType string) (*ProtoExport, er
 
 					i, check := findService(pe.Packages[index].Services, parent.Name)
 					if check {
-						pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, rpc.Name)
+						pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name})
 					} else {
 						// Add service and rpc
 						pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
 							Service: parent.Name,
-							RPCs:    []string{rpc.Name},
+							RPCs:    []RPCItem{RPCItem{Name: rpc.Name}},
 						})
 					}
 				}))

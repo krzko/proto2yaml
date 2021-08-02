@@ -5,7 +5,7 @@ EXECUTABLE:=proto2yaml
 DOCKER_REGISTRY:=ghcr.io
 DOCKER_USER:=krzko
 
-VERSION:=v0.0.3
+VERSION:=v0.0.4
 COMMIT=$(shell git describe --tags --always --long)
 NOW=$(shell date +'%Y%m%d')
 

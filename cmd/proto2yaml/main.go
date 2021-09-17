@@ -39,6 +39,7 @@ type ServiceItem struct {
 
 type RPCItem struct {
 	Name string `json:"name" yaml:"name"`
+	Type string `json:"type" yaml:"type"`
 }
 
 func main() {
@@ -127,7 +128,7 @@ func main() {
 						}
 
 						// Return filtered files
-						ff, err := searchFiles(files, "Request) returns")
+						ff, err := searchFiles(files, "all")
 						if err != nil {
 							fmt.Println(err)
 						}
@@ -218,7 +219,7 @@ func main() {
 						}
 
 						// Return filtered files
-						ff, err := searchFiles(files, "Request) returns")
+						ff, err := searchFiles(files, "all")
 						if err != nil {
 							fmt.Println(err)
 						}
@@ -341,7 +342,7 @@ func main() {
 						}
 
 						// Return filtered files
-						ff, err := searchFiles(files, "Request) returns")
+						ff, err := searchFiles(files, "all")
 						if err != nil {
 							fmt.Println(err)
 						}
@@ -421,7 +422,7 @@ func main() {
 						}
 
 						// Return filtered files
-						ff, err := searchFiles(files, "Request) returns")
+						ff, err := searchFiles(files, "all")
 						if err != nil {
 							fmt.Println(err)
 						}
@@ -543,14 +544,26 @@ func generateExport(files, filter []string, filterType string) (*ProtoExport, er
 								return
 							}
 
+							var rpcType string
+							switch {
+							case !rpc.StreamsRequest && !rpc.StreamsReturns:
+								rpcType = "unary"
+							case !rpc.StreamsRequest && rpc.StreamsReturns:
+								rpcType = "server-streaming"
+							case rpc.StreamsRequest && !rpc.StreamsReturns:
+								rpcType = "client-streaming"
+							case rpc.StreamsRequest && rpc.StreamsReturns:
+								rpcType = "bidirectional-streaming"
+							}
+
 							i, check := findService(pe.Packages[index].Services, parent.Name)
 							if check {
-								pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name})
+								pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name, Type: rpcType})
 							} else {
 								// Add service and rpc
 								pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
 									Service: parent.Name,
-									RPCs:    []RPCItem{RPCItem{Name: rpc.Name}},
+									RPCs:    []RPCItem{RPCItem{Name: rpc.Name, Type: rpcType}},
 								})
 							}
 						}))
@@ -596,14 +609,26 @@ func generateExport(files, filter []string, filterType string) (*ProtoExport, er
 										return
 									}
 
+									var rpcType string
+									switch {
+									case !rpc.StreamsRequest && !rpc.StreamsReturns:
+										rpcType = "unary"
+									case !rpc.StreamsRequest && rpc.StreamsReturns:
+										rpcType = "server-streaming"
+									case rpc.StreamsRequest && !rpc.StreamsReturns:
+										rpcType = "client-streaming"
+									case rpc.StreamsRequest && rpc.StreamsReturns:
+										rpcType = "bidirectional-streaming"
+									}
+
 									i, check := findService(pe.Packages[index].Services, parent.Name)
 									if check {
-										pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name})
+										pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name, Type: rpcType})
 									} else {
 										// Add service and rpc
 										pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
 											Service: parent.Name,
-											RPCs:    []RPCItem{RPCItem{Name: rpc.Name}},
+											RPCs:    []RPCItem{RPCItem{Name: rpc.Name, Type: rpcType}},
 										})
 									}
 								}))
@@ -641,14 +666,26 @@ func generateExport(files, filter []string, filterType string) (*ProtoExport, er
 						return
 					}
 
+					var rpcType string
+					switch {
+					case !rpc.StreamsRequest && !rpc.StreamsReturns:
+						rpcType = "unary"
+					case !rpc.StreamsRequest && rpc.StreamsReturns:
+						rpcType = "server-streaming"
+					case rpc.StreamsRequest && !rpc.StreamsReturns:
+						rpcType = "client-streaming"
+					case rpc.StreamsRequest && rpc.StreamsReturns:
+						rpcType = "bidirectional-streaming"
+					}
+
 					i, check := findService(pe.Packages[index].Services, parent.Name)
 					if check {
-						pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name})
+						pe.Packages[index].Services[i].RPCs = append(pe.Packages[index].Services[i].RPCs, RPCItem{Name: rpc.Name, Type: rpcType})
 					} else {
 						// Add service and rpc
 						pe.Packages[index].Services = append(pe.Packages[index].Services, ServiceItem{
 							Service: parent.Name,
-							RPCs:    []RPCItem{RPCItem{Name: rpc.Name}},
+							RPCs:    []RPCItem{RPCItem{Name: rpc.Name, Type: rpcType}},
 						})
 					}
 				}))
@@ -687,10 +724,6 @@ func getFiles(root, extension string) ([]string, error) {
 	return files, nil
 }
 
-// func handleMessage(m *proto.Message) {
-// 	fmt.Printf("%v \n", m.Name)
-// }
-
 func handlePackage(p *proto.Package) {
 	fmt.Printf("%v\n", p.Name)
 }
@@ -699,12 +732,6 @@ func handleRPC(r *proto.RPC) {
 	parent := fmt.Sprintf("%v", r.Parent)
 	p := strings.Split(parent, " ")
 	fmt.Printf("%s %v | %v\n", color.BlueString("==>"), p[2], r.Name)
-
-	// fmt.Println("data written")
-}
-
-func handleService(s *proto.Service) {
-	fmt.Printf("%v\n", s.Name)
 }
 
 func parseFiles(files []string) {
@@ -720,36 +747,14 @@ func parseFiles(files []string) {
 		definition, _ := parser.Parse()
 
 		fmt.Printf("%s %s\n", color.GreenString("==>"), color.HiWhiteString("📄 "+f))
-		// proto.Walk(definition, proto.WithService(handleService), proto.WithMessage(handleMessage))
 		fmt.Printf("%s %s ", color.GreenString("==>"), color.HiWhiteString("📦 Package"))
 		proto.Walk(definition, proto.WithPackage(handlePackage))
-
-		// fmt.Printf("%s %s\n", color.GreenString("==>"), color.HiWhiteString("🎁 💈 Service/s"))
-		// proto.Walk(definition, proto.WithService(handleService))
 
 		fmt.Printf("%s %s\n", color.GreenString("==>"), color.HiWhiteString("🧩 Service | RPC"))
 		proto.Walk(definition, proto.WithRPC(handleRPC))
 
 	}
 
-}
-
-func contains(s []string, str string) (result bool) {
-	for _, v := range s {
-		if v == str {
-			return true
-		}
-	}
-	return false
-}
-
-func containsPackage(pis []PackageItem, str string) (result bool) {
-	for _, pi := range pis {
-		if pi.Package == str {
-			return true
-		}
-	}
-	return false
 }
 
 func containsService(sis []ServiceItem, str string) (result bool) {
@@ -781,26 +786,48 @@ func findService(sis []ServiceItem, str string) (int, bool) {
 
 func searchFiles(files []string, filter string) ([]string, error) {
 	var found []string
+	un, ss, cs, bid := 0, 0, 0, 0
 
 	fmt.Printf("%s %s%s%s\n", color.BlueString("==>"), color.HiWhiteString("Filter '"), color.HiGreenString(filter), color.HiWhiteString("'"))
 
 	for _, file := range files {
-		data, err := ioutil.ReadFile(file)
+		reader, err := ioutil.ReadFile(file)
 		if err != nil {
 			return nil, err
 		}
 
-		f := string(data)
-		//TODO(krzko): Better filter for stream/unary RPCs
-		if strings.Contains(f, "Request) returns (stream....") {
-			// Skip streams
-		} else if strings.Contains(f, filter) {
-			found = append(found, file)
-		}
+		r := strings.NewReader(string(reader))
+		parser := proto.NewParser(r)
+		definition, _ := parser.Parse()
+
+		proto.Walk(definition,
+			proto.WithRPC(func(rpc *proto.RPC) {
+				switch {
+				case !rpc.StreamsRequest && !rpc.StreamsReturns:
+					// fmt.Printf("Found unary service method - %s\n", rpc.Name)
+					found = append(found, file)
+					un++
+				case !rpc.StreamsRequest && rpc.StreamsReturns:
+					// fmt.Printf("Found server-streaming service method - %s\n", rpc.Name)
+					found = append(found, file)
+					ss++
+				case rpc.StreamsRequest && !rpc.StreamsReturns:
+					// fmt.Printf("Found client-streaming service method - %s\n", rpc.Name)
+					found = append(found, file)
+					cs++
+				case rpc.StreamsRequest && rpc.StreamsReturns:
+					// fmt.Printf("Found bidirectional-streaming service method - %s\n", rpc.Name)
+					found = append(found, file)
+					bid++
+				}
+			}))
 	}
 
-	fmt.Printf("%s %s %s %s\n", color.BlueString("==>"), color.HiWhiteString("Using"), color.HiGreenString(fmt.Sprint(len(found))), color.HiWhiteString("filtered files"))
-	return found, nil
+	fmt.Printf("%s %s %s %s %s %s %s\n", color.BlueString("==>"), color.HiWhiteString("Found"), color.HiWhiteString("Unary: %v,", un), color.HiWhiteString("Server Streaming: %v,", ss), color.HiWhiteString("Client Streaming: %v,", cs), color.HiWhiteString("Bidirectional Streaming: %v", bid), color.HiWhiteString("service methods"))
+	fmt.Printf("%s %s %s %s\n", color.BlueString("==>"), color.HiWhiteString("Using"), color.HiGreenString(fmt.Sprint(len(found))), color.HiWhiteString("filter service methods"))
+
+	uniqueFound := unique(found)
+	return uniqueFound, nil
 }
 
 func unique(stringSlice []string) []string {

@@ -20,6 +20,29 @@ The idea is to enumerate the associated protos and parse the export using a `yam
 
 Addition features such as filtering and [OpenSLO](https://github.com/OpenSLO/OpenSLO) export formating coming.
 
+## Output
+
+`proto2yaml` will export the your `.proto` files to the following format;
+
+```yaml
+version: v0.0.5
+packages:
+  - package: foo.service.profile.v1
+    services:
+      - service: ProfileAPI
+        rpc:
+          - name: GetProfiles
+            type: unary
+      - service: AdminAPI
+        rpc:
+          - name: CreateProfile
+            type: unary
+          - name: DeleteProfile
+            type: unary
+          - name: SyncProfile
+            type: server-streaming
+```
+
 ## Getting started
 
 Running `proto2yaml` is availabile through several methods. You can download it as a binary from GitHub releases, running it as a distroless docker image or building it from source.

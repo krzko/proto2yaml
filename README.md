@@ -22,7 +22,7 @@ Addition features such as filtering and [OpenSLO](https://github.com/OpenSLO/Ope
 
 ## Output
 
-`proto2yaml` will export the your `.proto` files to the following format;
+`proto2yaml` will export your `.proto` files using the following format;
 
 ```yaml
 version: v0.0.5

@@ -76,7 +76,7 @@ jobs:
             type=sha
       -
         name: Build and push Docker image
-        uses: docker/build-push-action@v3.0.0
+        uses: docker/build-push-action@v3.1.0
         with:
           build-args: |
             COMMIT=${{ github.sha }}

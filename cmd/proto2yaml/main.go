@@ -20,8 +20,9 @@ import (
 )
 
 var (
-	buildVersion string
-	// commit       string
+	version string
+	commit  string
+	date    string
 )
 
 type ProtoExport struct {
@@ -59,11 +60,13 @@ func main() {
 	c9 := color.New(c[9]).SprintFunc()
 	appName := fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", c0("p"), c1("r"), c2("o"), c3("t"), c4("o"), c5("2"), c6("y"), c7("a"), c8("m"), c9("l"))
 
+	v := fmt.Sprintf("v%v-%v (%v)", version, commit, date)
+
 	app := &cli.App{
 		Name:      appName,
 		Usage:     "A command-line utility to convert Protocol Buffers (proto) files to YAML",
 		UsageText: appName + " [global options] command [command options] [arguments...]",
-		Version:   buildVersion,
+		Version:   v,
 		CommandNotFound: func(c *cli.Context, command string) {
 			fmt.Fprintf(c.App.Writer, "proto2yaml: Command not found: %q\n", command)
 		},
@@ -474,7 +477,7 @@ func main() {
 // generateExport a filtered object, don't @ me :P
 func generateExport(files, filter []string, filterType string) (*ProtoExport, error) {
 	pe := &ProtoExport{}
-	pe.Version = buildVersion
+	pe.Version = version
 
 	for _, f := range files {
 		reader, _ := os.Open(f)

@@ -45,35 +45,27 @@ packages:
 
 ## Getting started
 
-Running `proto2yaml` is availabile through several methods. You can download it as a binary from GitHub releases, running it as a distroless docker image or building it from source.
+Running `proto2yaml` is availabile through several methods. You can using `brew`, download it as a binary from GitHub releases, or running it as a distroless docker image.
+
+### brew
+
+Install [brew](https://brew.sh/) and then run:
 
 ```sh
-NAME:
-   proto2yaml - A command-line utility to convert Protocol Buffers (proto) files to YAML
-
-USAGE:
-   proto2yaml [global options] command [command options] [arguments...]
-
-VERSION:
-   v0.0.5
-
-COMMANDS:
-   json     The outputs are formatted as JSON
-   yaml     The outputs are formatted as YAML
-   help, h  Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --help, -h     show help (default: false)
-   --version, -v  print the version (default: false)
+brew install krzko/tap/proto2yaml
 ```
 
-## Download Binary
+### Download Binary
 
-Download the latest [release](https://github.com/krzko/proto2yaml/releases).
+Download the latest version from the [Releases](https://github.com/krzko/proto2yaml/releases) page.
 
-## Docker
+### Docker
 
 Attach a [bind mount](https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount) to the source directory and the directory you want to export the file to.
+
+To see all the tags view the [Packages](https://github.com/krzko/proto2yaml/pkgs/container/proto2yaml) page.
+
+To run the docker image follow these examples:
 
 ```sh
 # Use current directory as source
@@ -91,6 +83,28 @@ docker run --rm \
     -v "/Users/foobar/code/protos":/searchme \
     -v "$(pwd)":/save \
     ghcr.io/krzko/proto2yaml:latest yaml print --source /searchme --file /save/example_protos.yaml
+```
+
+## Run
+
+```sh
+NAME:
+   proto2yaml - A command-line utility to convert Protocol Buffers (proto) files to YAML
+
+USAGE:
+   proto2yaml [global options] command [command options] [arguments...]
+
+VERSION:
+   proto2yaml version v0.0.6-9ad396c (2022-07-21T05:33:05Z)
+
+COMMANDS:
+   json     The outputs are formatted as JSON
+   yaml     The outputs are formatted as YAML
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h     show help (default: false)
+   --version, -v  print the version (default: false)
 ```
 
 ### Export

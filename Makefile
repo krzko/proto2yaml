@@ -5,7 +5,7 @@ EXECUTABLE:=proto2yaml
 DOCKER_REGISTRY:=ghcr.io
 DOCKER_USER:=krzko
 
-VERSION:=v0.0.5
+VERSION:=v0.6.6
 COMMIT=$(shell git describe --tags --always --long)
 NOW=$(shell date +'%Y%m%d')
 
@@ -21,9 +21,9 @@ WINDOWS:=${EXECUTABLE}_${VERSION}_windows_amd64
 
 all: clean build
 
-build: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux build-windows build-docker
+build-with-docker: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux build-windows build-docker
 
-build-no-docker: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux build-windows
+build: build-arm build-darwin-amd64 build-darwin-arm64 build-freebsd build-linux build-windows
 
 build-arm:
 	@echo "  🍒  Building binary ${ARM5}..."
